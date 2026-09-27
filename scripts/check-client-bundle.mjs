@@ -8,9 +8,9 @@ const allowed = new Set(['react', 'react/jsx-runtime', 'react-dom', 'react-dom/c
 const forbidden = [...new Set(imports.filter(id => !allowed.has(id)))].sort()
 
 assert.deepEqual(forbidden, [], `client bundle contains unavailable imports: ${forbidden.join(', ')}`)
-// The browser page is an official card on the Plugins page; the older
-// `settings.plugin.item` seat no longer exists on this Host line.
-assert.match(source, /plugins\.item/)
+// An external bundle owns its keyed configuration on its Plugins detail page.
+assert.match(source, /plugins\.bundle\.config/)
+assert.match(source, /key:\s*["']@anweat\/dsh-browser["']/)
 // The shared settings-form chrome must stay a module-table import, never inlined.
 assert.match(source, /@deepseek-ai\/dsh-client-ui-primitives/)
 assert.match(source, /dsh-browser/)

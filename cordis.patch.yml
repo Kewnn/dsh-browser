@@ -5,22 +5,9 @@
 #
 # Login state: prefer named `authProfiles` with explicit `allowedDomains` (see
 # README). `storageStatePath` remains as a legacy global fallback.
+# DSH 0.1.7-rc.2 persists editable config in a separate top-level profile row;
+# placing config inside insert can make settings writes appear successful but
+# disappear on restart. Config schema defaults supply the initial values.
 - insert:
     - id: browser
       name: '@anweat/dsh-browser'
-      config:
-        automationMode: standard
-        browserRuntime: playwright
-        channel: chromium
-        headless: true
-        opencliEnabled: true
-        usagePolicy:
-          minDelayMs: 750
-          maxConcurrency: 2
-          burst: 3
-          maxPagesPerRun: 20
-          maxDepth: 2
-          retryLimit: 2
-          backoffBaseMs: 1000
-          cooldownMs: 30000
-        verbose: false

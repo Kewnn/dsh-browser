@@ -10,12 +10,12 @@
 
 | 插件发布通道 | DSH 基线 | 兼容承诺 |
 |---|---|---|
-| npm `latest`（`0.1.12`） | `dsh-v0.1.1-rc.2` 至 `dsh-v0.1.2-rc.1` | 已验证维护基线 |
-| npm `next` 候选（`0.1.15-alpha.2`） | `dsh-v0.1.5-alpha.1` 至 `dsh-v0.1.7-rc.2` | 精确依赖与真实 profile 验收目标 |
+| `0.1.12` 及更早的维护版本 | `dsh-v0.1.1-rc.2` 至 `dsh-v0.1.2-rc.1` | 旧基线；不与新插件混装 |
+| `0.1.15` | `dsh-v0.1.7-rc.2` | 精确锁定此宿主版本；组合安装、真实 Web profile 与设置持久化已验证 |
 
-`0.1.15-alpha.2` 使用 DSH 新客户端分包：状态存储来自
+`0.1.15` 使用 DSH 新客户端分包：状态存储来自
 `dsh-client-store`，设置契约来自 `dsh-client-ui-settings`，客户端 Context
-来自 Cordis。该候选不会覆盖 npm `latest`。
+来自 Cordis。npm 上 `0.1.15-alpha.2` 仍声明旧版 DSH peer，不能与本版混用。
 
 启动期设置解析对宿主版本自适应：旧宿主仍提供 `settings.register(ns, schema, opts)`
 时沿用 live scope；`dsh-v0.1.7-rc.2` 起移除了该方法，设置页改由 Loader 条目的
@@ -29,25 +29,24 @@
 ## 安装
 
 ```bash
-dsh plugin --profile web add @anweat/dsh-browser
+dsh plugin --profile web add @anweat/dsh-browser@0.1.15
 # 或本地目录 / tarball：
 dsh plugin --profile web add ./dsh-browser
 # 重启（web profile 关闭了 HMR）：
 dsh --profile web
 ```
 
-> npm `latest` 延续现有维护基线；本开发分支精确适配 `dsh-v0.1.5-alpha.1`，
-> 并已通过 `dsh-v0.1.7-rc.2` 的真实 profile 验收。
+> 本版精确适配 `dsh-v0.1.7-rc.2`，不承诺兼容其他 DSH 版本。
 > 若你的 harness 是包含未发布提交的本地源码 checkout，版本号可能有出入——用
 > `dsh plugin --profile web add ./<path>` 并在 profile 的 `pnpm-workspace.yaml`
 > 里对齐版本后重装即可。
 
 ## 从旧版本升级
 
-Web Search Pro 与浏览器插件应同步升级；`dsh-web-search-pro >= 0.1.8` 需要 `@anweat/dsh-browser >= 0.1.8`。面向 `dsh-v0.1.5-alpha.1` 联调时，使用 browser 与 Web Search Pro 的 npm `next` 候选并完整重启 profile。0.1.11 移除了对旧版 `dsh-settings` 的运行时 `settingsNamespace` 导入；0.1.10 修复工具描述被 DSH 误解析为 prompt 变量。
+Web Search Pro 与浏览器插件应同步升级；面向 `dsh-v0.1.7-rc.2` 不要混用仍声明旧 peer 的 Browser `0.1.15-alpha.2`。
 
 ```bash
-dsh plugin --profile web add @anweat/dsh-browser@next dsh-web-search-pro@next
+dsh plugin --profile web add @anweat/dsh-browser@0.1.15 dsh-web-search-pro@0.1.15
 ```
 
 升级后完整停止并重启 Web profile，再调用 `browser_status`、`browser_opencli_status` 和 `web_backend_status`；仅刷新网页不会重新加载插件服务或 Web Search Pro 配置面板。尤其不要只升级 Web Search Pro：新的工具目录、Patchright 运行时和调用缓冲都来自浏览器插件。

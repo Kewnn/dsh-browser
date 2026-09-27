@@ -32,13 +32,15 @@ function stringField(payload: Record<string, unknown>, name: string): string {
 }
 
 export function registerAutomationAssetRpc(ctx: Context, store: AutomationAssetStore, service: BrowserService): void {
-  ctx.inject(['connection'], (connectionCtx) => {
+  ctx.inject(['connection', 'webServer'], (connectionCtx) => {
     // Register the channel with the Host transport rather than hand-rolling the
     // client-request/server-response envelope on an exact Fetch route. The
     // transport owns envelope decoding, the admission/authentication fence, the
     // cancellation signal, and the Peer scope the handler receives — none of
     // which a manual route can reconstruct.
-    const connection = (connectionCtx as unknown as {
+    // The dedicated registrar mounts its Web route through the Context that
+    // reads it. The root Context owns webServer; the plugin effect owns cleanup.
+    const connection = (connectionCtx.root as unknown as {
       connection: {
         rpc: {
           /** Register one authenticated absolute channel prefix owned by this plugin. */
