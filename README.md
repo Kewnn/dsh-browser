@@ -12,9 +12,9 @@
 |---|---|---|
 | `0.1.12` 及更早的维护版本 | `dsh-v0.1.1-rc.2` 至 `dsh-v0.1.2-rc.1` | 旧基线；不与新插件混装 |
 | `0.1.15` | `dsh-v0.1.7-rc.2` | 精确锁定该宿主版本；组合安装、真实 Web profile 与设置持久化已验证 |
-| `0.1.16` | `dsh-v0.1.7-rc.2` ~ `dsh-v0.2.0-rc.2` | peer 改为范围声明；在 `0.2.0-rc.2` 上完成 typecheck、构建、测试与真实挂载验证 |
+| `0.1.17` | `dsh-v0.1.7-rc.2` ~ `dsh-v0.2.0-rc.2` | peer 改为范围声明；在 `0.2.0-rc.2` 上完成 typecheck、构建、52 项测试与真实挂载验证；补充浏览器缓存路径配置说明 |
 
-`0.1.16` 把 DSH 运行时依赖由精确锁定改为范围声明（`>=0.1.7-rc.2 <0.3.0`），
+`0.1.17` 把 DSH 运行时依赖由精确锁定改为范围声明（`>=0.1.7-rc.2 <0.3.0`），
 使同一份包可装在 `0.1.7-rc.2` 与 `0.2.0-rc.2` 两代宿主上（两代之间的 `defineTool`、
 凭据引用、配置表单与客户端槽位契约在本插件用到的范围内保持兼容）。
 `0.1.15` 使用 DSH 新客户端分包：状态存储来自
@@ -33,7 +33,7 @@
 ## 安装
 
 ```bash
-dsh plugin --profile web add @anweat/dsh-browser@0.1.16
+dsh plugin --profile web add @anweat/dsh-browser@0.1.17
 # 或本地目录 / tarball：
 dsh plugin --profile web add ./dsh-browser
 # 重启（web profile 关闭了 HMR）：
@@ -47,10 +47,10 @@ dsh --profile web
 
 ## 从旧版本升级
 
-Web Search Pro 与浏览器插件应同步升级；面向 `dsh-v0.1.7-rc.2` 不要混用仍声明旧 peer 的 Browser `0.1.15-alpha.2`；两者都升到 `0.1.16` 即可。
+Web Search Pro 与浏览器插件应同步升级；面向 `dsh-v0.1.7-rc.2` 不要混用仍声明旧 peer 的 Browser `0.1.15-alpha.2`；两者都升到 `0.1.17` 即可。
 
 ```bash
-dsh plugin --profile web add @anweat/dsh-browser@0.1.16 dsh-web-search-pro@0.1.16
+dsh plugin --profile web add @anweat/dsh-browser@0.1.17 dsh-web-search-pro@0.1.17
 ```
 
 升级后完整停止并重启 Web profile，再调用 `browser_status`、`browser_opencli_status` 和 `web_backend_status`；仅刷新网页不会重新加载插件服务或 Web Search Pro 配置面板。尤其不要只升级 Web Search Pro：新的工具目录、Patchright 运行时和调用缓冲都来自浏览器插件。
@@ -95,6 +95,21 @@ DSH 会话示例：
 | **playwright 驱动**（JS 包） | `playwright` npm 依赖 | 插件本地 node_modules 优先，缺省回退全局 npm |
 | **patchright 驱动**（可选） | 与 Playwright 同版本的 Chromium 兼容驱动 | 插件内置；配置 `browserRuntime: patchright` 才启用 |
 | **opencli**（纯 Node CLI） | `@jackwener/opencli` npm 依赖 | 同上，本地优先 / 全局复用 |
+
+### 把共享浏览器缓存放到别的盘（可选）
+
+共享缓存默认落在 `%LOCALAPPDATA%\ms-playwright`（Windows 上即系统盘，约 400MB）。
+若要把内核放在别的盘、或直接复用一份已有的内核，在 loader 条目上显式给出可执行文件路径：
+
+```yaml
+- id: browser
+  config:
+    executablePath: 'E:/caches/ms-playwright/chromium-1234/chrome-win64/chrome.exe'
+```
+
+`executablePath` 必须指向真实的内核可执行文件（不是目录）；设置后 `browser_status` 会显示该路径，
+`browser_install` 不再需要执行。`browserRuntime: patchright` 时同样适用。
+注意该字段在插件挂载时解析：改完需要重新加载 profile（重启 Web profile），仅刷新网页不生效。
 
 ## 服务：`browser`
 
